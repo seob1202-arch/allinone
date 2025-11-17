@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맞춤 여행 상품 추천</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        /* --- CSS Styles --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #667eea; --primary-dark: #5568d3; --secondary: #764ba2; --accent: #f093fb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1a202c; --gray: #718096; --light: #f7fafc; }
+        body { font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; line-height: 1.6; color: #333; background: #ffffff; overflow-x: hidden; word-break: keep-all; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Loading Screen */
+        .initial-loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; }
+        .initial-loading.hidden { display: none; }
+        
+        /* Header */
+        .hero {
+            background-color: #1a202c;
+            background-image: linear-gradient(135deg, #1a202c 0%, #111827 50%, #0F172A 100%), 
+                              url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill-opacity=".015" fill="white"%3E%3Crect width="1" height="1"/%3E%3C/svg%3E');
+            color: white;
+            padding: 120px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content { position: relative; z-index: 2; }
+
+        .hero h1 {
+            font-size: 3.2em;
+            margin-bottom: 25px;
+            font-weight: 900;
+            line-height: 1.3;
+            background: linear-gradient(180deg, #FFFFFF 60%, #E0E7FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            margin-bottom: 45px;
+            color: rgba(230, 230, 230, 0.85);
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            background: white;
+            color: var(--primary);
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: -1;
+        }
+        .cta-button:hover::before { left: 100%; }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .trust-item:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* Survey Section */
+        .survey-section { background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%); padding: 80px 20px; }
+        .survey-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 15px; color: var(--dark); font-weight: 900; }
+        .survey-section .subtitle { text-align: center; color: var(--gray); margin-bottom: 60px; font-size: 1.2em; }
+        .progress-container { max-width: 600px; margin: 0 auto 50px; }
+        .progress-bar { background: #e2e8f0; height: 12px; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .progress-fill { background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); height: 100%; width: 25%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; box-shadow: 0 0 10px rgba(102, 126, 234, 0.5); }
+        .progress-text { text-align: center; margin-top: 10px; color: var(--gray); font-weight: 600; }
+        .question { display: none; animation: fadeInUp 0.6s; }
+        .question.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .question h3 { font-size: 1.8em; margin-bottom: 40px; text-align: center; color: var(--dark); font-weight: 700; }
+        .question-nav { text-align: center; margin-bottom: 30px; }
+        .btn-back { background: transparent; border: 2px solid var(--gray); color: var(--gray); padding: 10px 30px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-back:hover { background: var(--gray); color: white; }
+        .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto; }
+        .option { background: white; border: 3px solid #e2e8f0; padding: 35px 25px; border-radius: 20px; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; overflow: hidden; }
+        .option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent); transition: left 0.5s; }
+        .option:hover::before { left: 100%; }
+        .option:hover { border-color: var(--primary); transform: translateY(-8px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25); }
+        .option.selected { border-color: var(--primary); background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .option-icon { font-size: 3.5em; margin-bottom: 15px; filter: grayscale(0.3); transition: filter 0.3s; }
+        .option:hover .option-icon, .option.selected .option-icon { filter: grayscale(0); }
+        .option-text { font-weight: 700; color: var(--dark); margin-bottom: 8px; font-size: 1.1em; }
+        .option-desc { font-size: 0.95em; color: var(--gray); }
+        
+        /* Loading Screen */
+        .loading-screen { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: white; }
+        .loading-screen.active { display: flex; }
+        .loader { width: 80px; height: 80px; border: 8px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 30px; font-size: 1.5em; font-weight: 700; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* Results Section */
+        .results-section { background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%); padding: 80px 20px; display: none; }
+        .results-section.active { display: block; }
+        .results-header { text-align: center; margin-bottom: 40px; }
+        .results-header h2 { font-size: 2.8em; color: var(--dark); margin-bottom: 20px; font-weight: 900; }
+        .results-actions { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+        .btn-reset { padding: 12px 30px; border-radius: 25px; font-weight: 600; cursor: pointer; font-size: 1em; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; background: white; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-reset:hover { background: var(--primary); color: white; }
+        
+        /* Email/Link Capture */
+        .email-capture { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); margin-bottom: 50px; text-align: center; }
+        .email-capture h3 { font-size: 1.8em; color: var(--dark); margin-bottom: 15px; font-weight: 700; }
+        .email-capture p { color: var(--gray); margin-bottom: 25px; }
+        .url-display { margin: 20px 0; }
+        .url-display input { width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 14px; text-align: center; background: #f8f9fa; cursor: pointer; }
+        .email-submit { padding: 15px 35px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none; border-radius: 25px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 1em; }
+        .email-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .email-success { display: none; color: var(--success); margin-top: 15px; font-weight: 600; }
+        .email-success.show { display: block; }
+        
+        /* Matching Score */
+        .matching-score { background: white; padding: 50px; border-radius: 30px; text-align: center; margin-bottom: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .matching-score::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.05), transparent); animation: shimmer 3s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); } 100% { transform: translateX(100%) translateY(100%) rotate(45deg); } }
+        .score-content { position: relative; z-index: 1; }
+        .score-number { font-size: 5em; font-weight: 900; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 30px 0; }
+        .score-label { font-size: 1.3em; color: var(--gray); font-weight: 500; }
+        .score-badge { display: inline-block; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; padding: 10px 25px; border-radius: 25px; font-weight: 700; margin-top: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        
+        /* Radar Chart */
+        .radar-chart { background: white; padding: 40px; border-radius: 30px; margin-bottom: 60px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .radar-chart h3 { text-align: center; font-size: 1.8em; margin-bottom: 30px; color: var(--dark); font-weight: 700; }
+        .chart-container { max-width: 500px; margin: 0 auto; position: relative; height: 350px; }
+        .chart-description { text-align: center; color: var(--gray); margin-top: 25px; font-size: 1.05em; line-height: 1.6; }
+        
+        /* Timeline Steps */
+        .timeline-step { margin-bottom: 80px; }
+        .step-header { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; padding: 25px; background: white; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+        .step-icon { font-size: 3em; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 20px; flex-shrink: 0; color: white; }
+        .step-info { flex: 1; }
+        .step-title { font-size: 2em; color: var(--dark); font-weight: 900; margin-bottom: 5px; }
+        .step-subtitle { color: var(--gray); font-size: 1.15em; }
+        
+        /* Product Cards */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
+        .product-card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 2px solid transparent; position: relative; display: flex; flex-direction: column; }
+        .product-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); transform: scaleX(0); transition: transform 0.4s; }
+        .product-card:hover::before { transform: scaleX(1); }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2); border-color: var(--primary); }
+        .product-image { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
+        .product-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 1.25em; font-weight: 700; color: var(--dark); margin-bottom: 10px; line-height: 1.3; }
+        .product-reason { color: var(--primary); font-weight: 600; margin-bottom: 10px; font-size: 0.9em; display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
+        .product-desc { color: var(--gray); margin-bottom: 15px; font-size: 0.9em; line-height: 1.5; flex-grow: 1; }
+        .product-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+        .feature-tag { background: #f0f3f7; color: var(--gray); padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f0f3f7; margin-top: auto; }
+        .product-price { font-size: 1.4em; font-weight: 900; color: var(--dark); }
+        .product-cta { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 12px 25px; border: none; border-radius: 25px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); white-space: nowrap; }
+        .product-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        
+        /* Exit Popup */
+        .exit-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; padding: 20px; }
+        .exit-popup.active { display: flex; }
+        .exit-popup-content { background: white; padding: 40px; border-radius: 25px; max-width: 450px; width: 100%; text-align: center; position: relative; }
+        .exit-popup .exit-popup-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.8em; cursor: pointer; color: var(--gray); transition: color 0.3s; padding: 5px; line-height: 1; width: auto; border-radius: 50%; }
+        .exit-popup-close:hover { color: var(--dark); background-color: rgba(0,0,0,0.05); }
+        .exit-popup h3 { font-size: 1.8em; color: var(--dark); margin-bottom: 15px; font-weight: 900; }
+        .exit-popup p { color: var(--gray); margin-bottom: 25px; line-height: 1.5; font-size: 1em; }
+        .exit-popup button { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 16px 30px; border: none; border-radius: 50px; font-size: 1.1em; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.3s; margin-top: 0; }
+        .exit-popup button:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .hero { padding: 90px 15px; } 
+            .hero h1 { font-size: 2.2em; } 
+            .hero p { font-size: 1.0em; margin-bottom: 40px; } 
+            .cta-button { font-size: 1.0em; padding: 16px 28px; white-space: normal; text-align: center; }
+            .cta-button span:last-child { display: none; }
+            .trust-indicators { flex-direction: column; gap: 15px; margin-top: 40px; }
+            .trust-item { font-size: 0.9em; padding: 8px 18px; justify-content: center; white-space: normal; text-align: center; }
+            .options { grid-template-columns: 1fr; gap: 15px; }
+            .option { padding: 25px 15px; }
+            .option-icon { font-size: 2.8em; }
+            .option-text { font-size: 1.0em; }
+            .option-desc { font-size: 0.8em; }
+            .results-section { padding: 60px 10px; }
+            .results-section .container { padding: 0 5px; }
+            .products-grid { grid-template-columns: 1fr; gap: 15px; }
+            .product-content { padding: 15px; }
+            .product-name { font-size: 1.1em; margin-bottom: 8px; }
+            .product-reason { font-size: 0.8em; margin-bottom: 8px; }
+            .product-desc { font-size: 0.8em; margin-bottom: 10px; line-height: 1.4;}
+            .product-features { margin-bottom: 10px; gap: 4px;}
+            .feature-tag { font-size: 0.7em; padding: 3px 8px; }
+            .product-footer { padding-top: 10px; }
+            .product-price { font-size: 1.15em; }
+            .product-cta { font-size: 0.85em; padding: 9px 18px;}
+            .results-header h2 { font-size: 1.8em; }
+            .score-number { font-size: 3.5em; }
+            .step-header { gap: 8px; padding: 18px; }
+            .step-icon { width: 55px; height: 55px; font-size: 2.2em; }
+            .step-title { font-size: 1.4em; }
+            .step-subtitle { font-size: 0.95em; }
+            .exit-popup-content { padding: 30px 20px; }
+            .exit-popup h3 { font-size: 1.5em; margin-bottom: 10px;}
+            .exit-popup p { font-size: 0.9em; margin-bottom: 20px;}
+            .exit-popup button { font-size: 1em; padding: 14px 25px;}
+            .exit-popup .exit-popup-close { font-size: 1.5em; top: 8px; right: 8px;}
+            .chart-container { height: 280px; }
+        }
+        @media (max-width: 480px) {
+            .hero { padding: 70px 10px; } 
+            .hero h1 { font-size: 1.9em; } 
+            .hero p { font-size: 0.9em; }
+            .cta-button { font-size: 0.9em; padding: 12px 22px; }
+            .trust-item { font-size: 0.85em; padding: 6px 15px;} 
+            .survey-section { padding: 60px 10px; }
+            .survey-section h2 { font-size: 1.6em; }
+            .survey-section .subtitle { font-size: 0.85em; margin-bottom: 30px;}
+            .question h3 { font-size: 1.3em; margin-bottom: 25px;}
+            .results-section { padding: 50px 5px; }
+            .score-number { font-size: 2.8em; margin: 15px 0; }
+            .score-label { font-size: 0.9em; }
+            .score-badge { font-size: 0.8em; padding: 6px 15px; }
+            .step-title { font-size: 1.1em; }
+            .step-subtitle { font-size: 0.85em; }
+            .product-name { font-size: 0.95em; }
+            .product-reason { font-size: 0.75em; gap: 4px; margin-bottom: 6px;}
+            .product-desc { font-size: 0.75em; line-height: 1.3; margin-bottom: 8px;}
+            .feature-tag { font-size: 0.65em; padding: 2px 6px; }
+            .product-price { font-size: 1.0em; }
+            .product-cta { font-size: 0.75em; padding: 7px 14px;}
+            .radar-chart { padding: 20px; margin-bottom: 30px;}
+            .radar-chart h3 { font-size: 1.2em; margin-bottom: 15px;}
+            .chart-container { height: 210px; }
+            .email-capture { padding: 25px 15px;}
+            .email-capture h3 { font-size: 1.2em; }
+            .email-capture p { font-size: 0.85em; }
+            .email-submit { font-size: 0.85em; padding: 10px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Initial Loading Screen -->
+    <div class="initial-loading" id="initialLoading">
+        <div class="loader"></div>
+        <div class="loading-text">데이터를 불러오는 중...</div>
+    </div>
+
+    <!-- Progress Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">AI가 당신의 여행 스타일을 분석하고 있습니다...</div>
+    </div>
+
+    <!-- Exit Popup -->
+    <div class="exit-popup" id="exitPopup">
+        <div class="exit-popup-content">
+            <button class="exit-popup-close" onclick="closeExitPopup()">×</button>
+            <h3>잠깐만요! 🎁</h3>
+            <p>지금 1분만 투자하면<br>나에게 딱 맞는 여행을 찾을 수 있어요!</p>
+            <button onclick="closeExitPopup(); scrollToSurvey();">지금 바로 시작하기</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection">
+        <div class="hero-content">
+            <div class="container">
+                <h1 id="heroTitle">맞춤 여행 추천</h1>
+                <p id="heroSubtitle">잠시만 기다려주세요...</p>
+                <button class="cta-button" onclick="startSurvey()">
+                    <span id="ctaText">설문 시작하기</span>
+                    <span>→</span>
+                </button>
+                <div class="trust-indicators" id="trustIndicators"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Survey Section -->
+    <section class="survey-section" id="surveySection">
+        <div class="container">
+            <h2 id="surveyTitle">1분이면 충분해요</h2>
+            <p class="subtitle" id="surveySubtitle">나만을 위한 여행 찾기</p>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">1 / 4 단계</div>
+            </div>
+            <div id="questionsContainer"></div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+        <div class="container">
+            <div class="results-header">
+                <h2 id="resultTitle">맞춤 여행 추천!</h2>
+                <div class="results-actions">
+                    <button class="btn-reset" onclick="resetSurvey()">
+                        <span>🔄</span>
+                        <span>다시 추천받기</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="matching-score">
+                <div class="score-content">
+                    <h3>내 여행 스타일 매칭 점수</h3>
+                    <div class="score-number" id="scoreNumber">0점</div>
+                    <p class="score-label">스타일 분석 완료! 최적 상품만 모았어요.</p>
+                    <div class="score-badge">✨ 추천 준비 완료</div>
+                </div>
+            </div>
+
+            <div class="radar-chart">
+                <h3>나의 여행 스타일 분석</h3>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <p class="chart-description" id="chartDescription">여행자님의 성향을 분석하여 최적의 상품을 추천했습니다.</p>
+            </div>
+
+            <div class="timeline-step">
+                <div class="step-header">
+                    <div class="step-icon">✈️</div>
+                    <div class="step-info">
+                        <div class="step-title">STEP 1. 출국 전 준비</div>
+                        <div class="step-subtitle">여행의 시작, 든든하고 편안하게</div>
+                    </div>
+                </div>
+                <div class="products-grid" id="step1Products"></div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="step-header">
+                    <div class="step-icon">🏨</div>
+                    <div class="step-info">
+                        <div class="step-title">STEP 2. 편안한 휴식</div>
+                        <div class="step-subtitle">여행의 질을 높이는 숙소</div>
+                    </div>
+                </div>
+                <div class="products-grid" id="step2Products"></div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="step-header">
+                    <div class="step-icon">🎉</div>
+                    <div class="step-info">
+                        <div class="step-title">STEP 3. 여행 즐기기</div>
+                        <div class="step-subtitle">잊지 못할 특별한 순간 만들기</div>
+                    </div>
+                </div>
+                <div class="products-grid" id="step3Products"></div>
+            </div>
+
+            <div class="email-capture">
+                <h3>📋 친구에게 이 설문 추천하기</h3>
+                <p>친구에게 설문 링크를 공유하고<br>맞춤 여행 상품을 추천받도록 도와주세요!</p>
+                <div class="url-display" id="urlDisplay" style="display:none;">
+                    <input type="text" id="urlInput" readonly>
+                </div>
+                <button class="email-submit" onclick="showAndCopyUrl()">🔗 설문 링크 복사하기</button>
+                <div class="email-success" id="copySuccess">✓ 링크가 클립보드에 복사되었습니다!</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ===================================
+        // 구글 스프레드시트 설정
+        // ===================================
+        const GOOGLE_SHEETS_CONFIG = {
+            // 여기에 구글 스프레드시트 CSV URL을 입력하세요
+            // 예시: 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Config'
+            configUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=0&single=true&output=csv',
+            questionsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=2022399600&single=true&output=csv',
+            productsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=756871285&single=true&output=csv'
+        };
+
+        // ===================================
+        // 전역 변수
+        // ===================================
+        let currentRegion = null;
+        let configData = null;
+        let questionsData = [];
+        let productsData = [];
+        let currentQuestion = 1;
+        let answers = {};
+        let exitIntentShown = false;
+
+        // ===================================
+        // 데이터 로딩 함수
+        // ===================================
+        async function loadCSVData(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        resolve(results.data);
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        async function initializeApp() {
+            try {
+                // URL에서 region 파라미터 가져오기
+                const urlParams = new URLSearchParams(window.location.search);
+                currentRegion = urlParams.get('region') || 'las_vegas'; // 기본값
+
+                // 데이터 로딩
+                const [config, questions, products] = await Promise.all([
+                    loadCSVData(GOOGLE_SHEETS_CONFIG.configUrl),
+                    loadCSVData(GOOGLE_SHEETS_CONFIG.questionsUrl),
+                    loadCSVData(GOOGLE_SHEETS_CONFIG.productsUrl)
+                ]);
+
+                // 현재 지역에 맞는 데이터 필터링
+                configData = config.find(row => row.region_id === currentRegion);
+                questionsData = questions.filter(row => row.region_id === currentRegion);
+                productsData = products.filter(row => row.region_id === currentRegion);
+
+                if (!configData) {
+                    throw new Error(`지역 '${currentRegion}'의 설정을 찾을 수 없습니다.`);
+                }
+
+                // UI 렌더링
+                renderHeroSection();
+                renderSurveySection();
+                updateProgress();
+
+                // 초기 로딩 화면 숨기기
+                document.getElementById('initialLoading').classList.add('hidden');
+
+                // URL 파라미터로 답변이 전달된 경우 결과 표시
+                if (urlParams.has('companion') && urlParams.has('style') && 
+                    urlParams.has('priority') && urlParams.has('destination')) {
+                    answers = {
+                        companion: urlParams.get('companion'),
+                        style: urlParams.get('style'),
+                        priority: urlParams.get('priority'),
+                        destination: urlParams.get('destination')
+                    };
+                    showResultsDirectly();
+                    history.replaceState(null, '', window.location.pathname + '?region=' + currentRegion);
+                }
+            } catch (error) {
+                console.error('데이터 로딩 오류:', error);
+                document.getElementById('initialLoading').innerHTML = `
+                    <div style="text-align: center; color: white;">
+                        <h2>⚠️ 데이터 로딩 실패</h2>
+                        <p>구글 스프레드시트 연결을 확인해주세요.</p>
+                        <p style="font-size: 0.9em; margin-top: 20px;">${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: white; color: #667eea; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">다시 시도</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ===================================
+        // Hero 섹션 렌더링
+        // ===================================
+        function renderHeroSection() {
+            document.getElementById('heroTitle').innerHTML = configData.hero_title || '맞춤 여행 추천';
+            document.getElementById('heroSubtitle').innerHTML = configData.hero_subtitle || '설문을 시작하세요';
+            document.getElementById('ctaText').textContent = configData.cta_text || '설문 시작하기';
+            
+            const trustHtml = [
+                configData.trust_indicator_1,
+                configData.trust_indicator_2,
+                configData.trust_indicator_3
+            ].filter(item => item).map(item => 
+                `<div class="trust-item">✓ ${item}</div>`
+            ).join('');
+            
+            document.getElementById('trustIndicators').innerHTML = trustHtml;
+            document.getElementById('surveyTitle').textContent = configData.survey_title || '설문 시작';
+            document.getElementById('surveySubtitle').textContent = configData.survey_subtitle || '답변해주세요';
+            document.getElementById('resultTitle').innerHTML = configData.result_title || '추천 결과';
+        }
+
+        // ===================================
+        // 설문 섹션 렌더링
+        // ===================================
+        function renderSurveySection() {
+            const container = document.getElementById('questionsContainer');
+            const questions = groupQuestions();
+            
+            container.innerHTML = questions.map((q, index) => {
+                const questionNum = index + 1;
+                const backButton = questionNum > 1 ? 
+                    `<div class="question-nav">
+                        <button class="btn-back" onclick="previousQuestion(${questionNum})">← 이전</button>
+                    </div>` : '';
+                
+                return `
+                    <div class="question ${questionNum === 1 ? 'active' : ''}" id="q${questionNum}">
+                        ${backButton}
+                        <h3>${q.question_text}</h3>
+                        <div class="options">
+                            ${q.options.map(opt => `
+                                <div class="option" onclick="handleClick(${questionNum}, '${opt.option_id}', '${opt.answer_key}')">
+                                    <div class="option-icon">${opt.option_icon}</div>
+                                    <div class="option-text">${opt.option_text}</div>
+                                    ${opt.option_desc ? `<div class="option-desc">${opt.option_desc}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function groupQuestions() {
+            const grouped = [];
+            const questionIds = [...new Set(questionsData.map(q => q.question_id))];
+            
+            questionIds.sort((a, b) => {
+                const orderA = parseInt(questionsData.find(q => q.question_id === a).question_order);
+                const orderB = parseInt(questionsData.find(q => q.question_id === b).question_order);
+                return orderA - orderB;
+            });
+            
+            questionIds.forEach(qId => {
+                const questionRows = questionsData.filter(q => q.question_id === qId);
+                const options = questionRows.map(q => ({
+                    option_id: q.option_id,
+                    option_order: parseInt(q.option_order),
+                    option_icon: q.option_icon,
+                    option_text: q.option_text,
+                    option_desc: q.option_desc,
+                    answer_key: q.answer_key
+                })).sort((a, b) => a.option_order - b.option_order);
+                
+                grouped.push({
+                    question_id: qId,
+                    question_text: questionRows[0].question_text,
+                    options: options
+                });
+            });
+            
+            return grouped;
+        }
+
+        // ===================================
+        // 설문 진행 함수
+        // ===================================
+        window.handleClick = function(questionNum, value, answerKey) {
+            answers[answerKey] = value;
+            
+            const options = document.querySelectorAll(`#q${questionNum} .option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.closest('.option').classList.add('selected');
+
+            setTimeout(() => {
+                const totalQuestions = groupQuestions().length;
+                if (questionNum < totalQuestions) {
+                    nextQuestion(questionNum);
+                } else {
+                    showResults();
+                }
+            }, 400);
+        }
+
+        function nextQuestion(currentQ) {
+            document.getElementById(`q${currentQ}`).classList.remove('active');
+            document.getElementById(`q${currentQ + 1}`).classList.add('active');
+            currentQuestion = currentQ + 1;
+            updateProgress();
+        }
+
+        function previousQuestion(currentQ) {
+            if (currentQ > 1) {
+                document.getElementById(`q${currentQ}`).classList.remove('active');
+                document.getElementById(`q${currentQ - 1}`).classList.add('active');
+                currentQuestion = currentQ - 1;
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const totalQuestions = groupQuestions().length;
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${currentQuestion} / ${totalQuestions} 단계`;
+        }
+
+        function startSurvey() {
+            document.getElementById('surveySection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToSurvey() {
+            document.getElementById('surveySection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ===================================
+        // 결과 표시 함수
+        // ===================================
+        function showResults() {
+            document.getElementById('loadingScreen').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.remove('active');
+                document.querySelector('.hero').style.display = 'none';
+                document.getElementById('surveySection').style.display = 'none';
+                document.getElementById('resultsSection').classList.add('active');
+                renderProducts();
+                animateScore();
+                createRadarChart();
+                setTimeout(() => { window.scrollTo(0, 0); }, 100);
+            }, 1500);
+        }
+
+        function showResultsDirectly() {
+            document.querySelector('.hero').style.display = 'none';
+            document.getElementById('surveySection').style.display = 'none';
+            document.getElementById('resultsSection').classList.add('active');
+            renderProducts();
+            animateScore();
+            createRadarChart();
+            setTimeout(() => { window.scrollTo(0, 0); }, 100);
+        }
+
+        function resetSurvey() {
+            answers = {};
+            currentQuestion = 1;
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+            document.getElementById('q1').classList.add('active');
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('resultsSection').classList.remove('active');
+            document.querySelector('.hero').style.display = 'block';
+            document.getElementById('surveySection').style.display = 'block';
+            updateProgress();
+            setTimeout(() => { window.scrollTo(0, 0); }, 100);
+        }
+
+        // ===================================
+        // 상품 추천 로직
+        // ===================================
+        function calculateRecommendations() {
+            const scored = productsData.map(product => {
+                let score = 0;
+                
+                // 동행자 매칭
+                const companions = product.target_companion ? product.target_companion.split(',').map(s => s.trim()) : [];
+                if (companions.includes(answers.companion)) {
+                    score += 30;
+                }
+                
+                // 우선순위 매칭
+                const priorities = product.target_priority ? product.target_priority.split(',').map(s => s.trim()) : [];
+                if (priorities.includes(answers.priority)) {
+                    score += 40;
+                }
+                
+                // 스타일 매칭
+                const styles = product.target_style ? product.target_style.split(',').map(s => s.trim()) : [];
+                if (styles.includes(answers.style)) {
+                    score += 20;
+                }
+                
+                // 목적지 매칭
+                const destinations = product.target_destination ? product.target_destination.split(',').map(s => s.trim()) : [];
+                if (destinations.includes(answers.destination)) {
+                    score += 15;
+                } else if (destinations.includes('other')) {
+                    score += 5;
+                }
+                
+                return { ...product, totalScore: score };
+            });
+            
+            return scored.sort((a, b) => b.totalScore - a.totalScore);
+        }
+
+        function renderProducts() {
+            const recommendations = calculateRecommendations();
+            
+            // Step 1: 출국 전 준비 (보험, 유심 등)
+            const step1 = recommendations.filter(p => parseInt(p.step) === 1).slice(0, 2);
+            
+            // Step 2: 숙소
+            const step2 = recommendations.filter(p => parseInt(p.step) === 2).slice(0, 2);
+            
+            // Step 3: 여행 상품
+            const step3 = recommendations.filter(p => parseInt(p.step) === 3).slice(0, 6);
+            
+            document.getElementById('step1Products').innerHTML = step1.map(createProductCard).join('');
+            document.getElementById('step2Products').innerHTML = step2.map(createProductCard).join('');
+            document.getElementById('step3Products').innerHTML = step3.map(createProductCard).join('');
+        }
+
+        function createProductCard(product) {
+            const tags = product.tags ? product.tags.split(',').map(t => t.trim()) : [];
+            const imageTag = product.image_url ? 
+                `<img src="${product.image_url}" alt="${product.name}" class="product-image" loading="lazy" onerror="this.style.backgroundColor='#eee'; this.alt='이미지 로딩 실패';">` : 
+                '<div style="width:100%; height:200px; background-color:#eee; display:flex; align-items:center; justify-content:center; color: #ccc;">이미지 없음</div>';
+            
+            return `
+                <div class="product-card" onclick="window.open('${product.product_url}', '_blank')">
+                    ${imageTag}
+                    <div class="product-content">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-reason">✓ ${product.reason}</div>
+                        <div class="product-desc">${product.desc}</div>
+                        <div class="product-features">
+                            ${tags.map(tag => `<span class="feature-tag">${tag}</span>`).join('')}
+                        </div>
+                        <div class="product-footer">
+                            <div class="product-price">💰 ${product.price}</div>
+                            <button class="product-cta">자세히 보기 →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===================================
+        // 점수 애니메이션
+        // ===================================
+        function animateScore() {
+            const finalScore = Math.floor(Math.random() * 5) + 95;
+            let current = 0;
+            const increment = finalScore / 50;
+            const scoreElement = document.getElementById('scoreNumber');
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalScore) {
+                    current = finalScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.floor(current) + '점';
+            }, 30);
+        }
+
+        // ===================================
+        // 레이더 차트
+        // ===================================
+        function createRadarChart() {
+            let chartStatus = Chart.getChart("radarChart");
+            if (chartStatus != undefined) {
+                chartStatus.destroy();
+            }
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const baseValues = {
+                safety: 75, 
+                communication: 80, 
+                convenience: 70, 
+                value: 75, 
+                experience: 85, 
+                special: 80
+            };
+
+            // 우선순위에 따른 조정
+            if (answers.priority === 'safety') { 
+                baseValues.safety = 95; 
+                baseValues.communication = 90; 
+            } else if (answers.priority === 'communication') { 
+                baseValues.communication = 95; 
+                baseValues.convenience = 90; 
+            } else if (answers.priority === 'value') { 
+                baseValues.value = 95; 
+                baseValues.convenience = 85; 
+            } else if (answers.priority === 'experience') { 
+                baseValues.experience = 95; 
+                baseValues.special = 90; 
+            }
+
+            // 스타일에 따른 조정
+            if (answers.style === 'photo') { 
+                baseValues.special = Math.min(100, baseValues.special + 10); 
+            } else if (answers.style === 'food') { 
+                baseValues.experience = Math.min(100, baseValues.experience + 10); 
+            } else if (answers.style === 'planned') { 
+                baseValues.convenience = Math.min(100, baseValues.convenience + 5); 
+            } else if (answers.style === 'spontaneous') { 
+                baseValues.experience = Math.min(100, baseValues.experience + 5); 
+            }
+
+            // 동행자에 따른 조정
+            if (answers.companion === 'family') { 
+                baseValues.safety = Math.min(100, baseValues.safety + 10); 
+            } else if (answers.companion === 'couple') { 
+                baseValues.special = Math.min(100, baseValues.special + 5); 
+            } else if (answers.companion === 'friends') { 
+                baseValues.experience = Math.min(100, baseValues.experience + 5); 
+            }
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['안전성', '편리한 소통', '편의성', '가성비', '현지 경험', '특별함'],
+                    datasets: [{
+                        label: '나의 여행 스타일',
+                        data: Object.values(baseValues),
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(118, 75, 162, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(118, 75, 162, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true, 
+                            max: 100, 
+                            ticks: { 
+                                stepSize: 20, 
+                                display: false 
+                            },
+                            pointLabels: { 
+                                font: { 
+                                    size: 14, 
+                                    family: 'Noto Sans KR', 
+                                    weight: '600' 
+                                }, 
+                                color: '#333' 
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            angleLines: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            enabled: true, 
+                            callbacks: { 
+                                label: function(context) { 
+                                    return context.dataset.label + ': ' + context.formattedValue; 
+                                } 
+                            } 
+                        }
+                    }
+                }
+            });
+
+            const priorityNames = {
+                safety: '안전성', 
+                communication: '편리한 소통', 
+                value: '가성비', 
+                experience: '특별한 경험'
+            };
+            document.getElementById('chartDescription').textContent = 
+                `여행자님은 '${priorityNames[answers.priority]}'을(를) 가장 중요하게 생각하시는군요! 이를 바탕으로 상품을 추천해 드렸어요.`;
+        }
+
+        // ===================================
+        // URL 복사 기능
+        // ===================================
+        function showAndCopyUrl() {
+            const surveyUrl = window.location.origin + window.location.pathname + '?region=' + currentRegion;
+            document.getElementById('urlDisplay').style.display = 'block';
+            document.getElementById('urlInput').value = surveyUrl;
+            const input = document.getElementById('urlInput');
+            input.focus();
+            input.select();
+            
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(surveyUrl).then(() => {
+                        document.getElementById('copySuccess').textContent = '✓ 설문 링크가 클립보드에 복사되었습니다!';
+                        document.getElementById('copySuccess').classList.add('show');
+                        setTimeout(() => { 
+                            document.getElementById('copySuccess').classList.remove('show'); 
+                        }, 2000);
+                    }).catch(err => {
+                        document.getElementById('copySuccess').textContent = '복사 실패! 직접 복사해주세요.';
+                        document.getElementById('copySuccess').classList.add('show');
+                    });
+                } else {
+                    document.getElementById('copySuccess').textContent = '브라우저에서 지원하지 않습니다. 직접 복사해주세요.';
+                    document.getElementById('copySuccess').classList.add('show');
+                }
+            } catch (err) {
+                document.getElementById('copySuccess').textContent = '오류 발생! 직접 복사해주세요.';
+                document.getElementById('copySuccess').classList.add('show');
+            }
+            
+            input.onclick = function() { this.select(); };
+        }
+
+        // ===================================
+        // Exit Intent Popup
+        // ===================================
+        document.addEventListener('mouseleave', (e) => {
+            if (e.clientY <= 0 && !exitIntentShown && !document.getElementById('resultsSection').classList.contains('active')) {
+                showExitPopup();
+            }
+        });
+
+        function showExitPopup() {
+            exitIntentShown = true;
+            document.getElementById('exitPopup').classList.add('active');
+        }
+
+        function closeExitPopup() {
+            document.getElementById('exitPopup').classList.remove('active');
+        }
+
+        // ===================================
+        // 앱 초기화
+        // ===================================
+        window.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
