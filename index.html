@@ -32,6 +32,65 @@
 
         .hero-content { position: relative; z-index: 2; }
 
+        /* 지역 선택 드롭다운 스타일 */
+        .region-selector-wrapper {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .region-selector-label {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .region-selector-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .region-select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 50px 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            font-family: 'Noto Sans KR', sans-serif;
+            min-width: 200px;
+        }
+
+        .region-select:hover {
+            background: white;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .region-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .region-selector-dropdown::after {
+            content: '▼';
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 0.8em;
+            pointer-events: none;
+        }
+
         .hero h1 {
             font-size: 3.2em;
             margin-bottom: 25px;
@@ -153,142 +212,69 @@
         .results-section.active { display: block; }
         .results-header { text-align: center; margin-bottom: 40px; }
         .results-header h2 { font-size: 2.8em; color: var(--dark); margin-bottom: 20px; font-weight: 900; }
-        .results-actions { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
-        .btn-reset { padding: 12px 30px; border-radius: 25px; font-weight: 600; cursor: pointer; font-size: 1em; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; background: white; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-reset:hover { background: var(--primary); color: white; }
-        
-        /* Email/Link Capture */
-        .email-capture { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); margin-bottom: 50px; text-align: center; }
-        .email-capture h3 { font-size: 1.8em; color: var(--dark); margin-bottom: 15px; font-weight: 700; }
-        .email-capture p { color: var(--gray); margin-bottom: 25px; }
-        .url-display { margin: 20px 0; }
-        .url-display input { width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 14px; text-align: center; background: #f8f9fa; cursor: pointer; }
-        .email-submit { padding: 15px 35px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none; border-radius: 25px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 1em; }
-        .email-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
-        .email-success { display: none; color: var(--success); margin-top: 15px; font-weight: 600; }
-        .email-success.show { display: block; }
-        
-        /* Matching Score */
-        .matching-score { background: white; padding: 50px; border-radius: 30px; text-align: center; margin-bottom: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-        .matching-score::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.05), transparent); animation: shimmer 3s infinite; }
-        @keyframes shimmer { 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); } 100% { transform: translateX(100%) translateY(100%) rotate(45deg); } }
-        .score-content { position: relative; z-index: 1; }
-        .score-number { font-size: 5em; font-weight: 900; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 30px 0; }
-        .score-label { font-size: 1.3em; color: var(--gray); font-weight: 500; }
-        .score-badge { display: inline-block; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; padding: 10px 25px; border-radius: 25px; font-weight: 700; margin-top: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-        
-        /* Radar Chart */
-        .radar-chart { background: white; padding: 40px; border-radius: 30px; margin-bottom: 60px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .radar-chart h3 { text-align: center; font-size: 1.8em; margin-bottom: 30px; color: var(--dark); font-weight: 700; }
-        .chart-container { max-width: 500px; margin: 0 auto; position: relative; height: 350px; }
-        .chart-description { text-align: center; color: var(--gray); margin-top: 25px; font-size: 1.05em; line-height: 1.6; }
-        
-        /* Timeline Steps */
-        .timeline-step { margin-bottom: 80px; }
-        .step-header { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; padding: 25px; background: white; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .step-icon { font-size: 3em; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 20px; flex-shrink: 0; color: white; }
+        .results-header p { font-size: 1.3em; color: var(--gray); font-weight: 500; }
+        .profile-card { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 50px 40px; border-radius: 30px; margin-bottom: 60px; box-shadow: 0 15px 50px rgba(102, 126, 234, 0.3); }
+        .profile-content { display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap; }
+        .profile-info { flex: 1; min-width: 250px; }
+        .profile-info h3 { font-size: 1.8em; margin-bottom: 25px; font-weight: 700; }
+        .profile-badges { display: flex; flex-wrap: wrap; gap: 12px; }
+        .badge { background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 0.95em; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); }
+        .radar-chart-container { flex: 1; min-width: 250px; max-width: 400px; height: 300px; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 20px; }
+        .chart-description { text-align: center; margin-top: 20px; font-size: 1em; opacity: 0.9; font-weight: 500; }
+        .timeline { margin-top: 60px; }
+        .timeline-step { background: white; border-radius: 30px; padding: 40px; margin-bottom: 40px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); }
+        .step-header { display: flex; align-items: center; gap: 25px; margin-bottom: 35px; }
+        .step-icon { font-size: 3.5em; }
         .step-info { flex: 1; }
-        .step-title { font-size: 2em; color: var(--dark); font-weight: 900; margin-bottom: 5px; }
-        .step-subtitle { color: var(--gray); font-size: 1.15em; }
-        
-        /* Product Cards */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
-        .product-card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 2px solid transparent; position: relative; display: flex; flex-direction: column; }
-        .product-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); transform: scaleX(0); transition: transform 0.4s; }
-        .product-card:hover::before { transform: scaleX(1); }
-        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2); border-color: var(--primary); }
-        .product-image { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
-        .product-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
-        .product-name { font-size: 1.25em; font-weight: 700; color: var(--dark); margin-bottom: 10px; line-height: 1.3; }
-        .product-reason { color: var(--primary); font-weight: 600; margin-bottom: 10px; font-size: 0.9em; display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
-        .product-desc { color: var(--gray); margin-bottom: 15px; font-size: 0.9em; line-height: 1.5; flex-grow: 1; }
-        .product-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-        .feature-tag { background: #f0f3f7; color: var(--gray); padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
-        .product-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f0f3f7; margin-top: auto; }
-        .product-price { font-size: 1.4em; font-weight: 900; color: var(--dark); }
-        .product-cta { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 12px 25px; border: none; border-radius: 25px; font-size: 0.95em; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); white-space: nowrap; }
-        .product-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
-        
-        /* Exit Popup */
-        .exit-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; padding: 20px; }
+        .step-title { font-size: 1.8em; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
+        .step-subtitle { color: var(--gray); font-size: 1.1em; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .product-card { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 20px; padding: 30px; transition: all 0.4s; cursor: pointer; position: relative; overflow: hidden; }
+        .product-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent); transition: left 0.5s; }
+        .product-card:hover::before { left: 100%; }
+        .product-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); }
+        .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .product-name { font-size: 1.3em; font-weight: 700; color: var(--dark); flex: 1; line-height: 1.3; }
+        .product-price { background: var(--primary); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.95em; white-space: nowrap; margin-left: 10px; }
+        .product-reason { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); color: var(--primary); padding: 12px 18px; border-radius: 15px; font-weight: 600; margin-bottom: 15px; font-size: 0.95em; }
+        .product-desc { color: var(--gray); margin-bottom: 15px; line-height: 1.6; font-size: 0.95em; }
+        .product-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .product-tag { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 15px; font-size: 0.85em; color: var(--gray); font-weight: 500; }
+        .email-capture { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 50px 40px; border-radius: 30px; text-align: center; margin-top: 60px; }
+        .email-capture h3 { font-size: 2em; margin-bottom: 15px; font-weight: 700; }
+        .email-capture p { font-size: 1.1em; margin-bottom: 30px; opacity: 0.9; }
+        .url-display { margin: 20px 0; }
+        .url-display input { width: 100%; max-width: 600px; padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 15px; font-size: 1em; text-align: center; background: rgba(255,255,255,0.95); }
+        .email-submit { background: white; color: var(--primary); border: none; padding: 18px 45px; border-radius: 50px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .email-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .email-success { display: none; margin-top: 20px; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.5); padding: 15px; border-radius: 15px; font-weight: 600; }
+        .email-success.show { display: block; }
+        .exit-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; animation: fadeIn 0.3s; }
         .exit-popup.active { display: flex; }
-        .exit-popup-content { background: white; padding: 40px; border-radius: 25px; max-width: 450px; width: 100%; text-align: center; position: relative; }
-        .exit-popup .exit-popup-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.8em; cursor: pointer; color: var(--gray); transition: color 0.3s; padding: 5px; line-height: 1; width: auto; border-radius: 50%; }
-        .exit-popup-close:hover { color: var(--dark); background-color: rgba(0,0,0,0.05); }
-        .exit-popup h3 { font-size: 1.8em; color: var(--dark); margin-bottom: 15px; font-weight: 900; }
-        .exit-popup p { color: var(--gray); margin-bottom: 25px; line-height: 1.5; font-size: 1em; }
-        .exit-popup button { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 16px 30px; border: none; border-radius: 50px; font-size: 1.1em; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.3s; margin-top: 0; }
-        .exit-popup button:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .exit-popup-content { background: white; padding: 50px 40px; border-radius: 30px; max-width: 500px; text-align: center; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .exit-popup h3 { font-size: 2em; margin-bottom: 20px; color: var(--dark); }
+        .exit-popup p { font-size: 1.1em; margin-bottom: 30px; color: var(--gray); }
+        .exit-popup-buttons { display: flex; gap: 15px; justify-content: center; }
+        .exit-popup-buttons button { padding: 15px 35px; border-radius: 25px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
+        .btn-stay { background: var(--primary); color: white; }
+        .btn-stay:hover { background: var(--primary-dark); }
+        .btn-leave { background: transparent; border: 2px solid var(--gray); color: var(--gray); }
+        .btn-leave:hover { background: var(--gray); color: white; }
 
-        /* Mobile Optimization */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .container { padding: 0 10px; }
-            .hero { padding: 90px 15px; } 
-            .hero h1 { font-size: 2.2em; } 
-            .hero p { font-size: 1.0em; margin-bottom: 40px; } 
-            .cta-button { font-size: 1.0em; padding: 16px 28px; white-space: normal; text-align: center; }
-            .cta-button span:last-child { display: none; }
-            .trust-indicators { flex-direction: column; gap: 15px; margin-top: 40px; }
-            .trust-item { font-size: 0.9em; padding: 8px 18px; justify-content: center; white-space: normal; text-align: center; }
-            .options { grid-template-columns: 1fr; gap: 15px; }
-            .option { padding: 25px 15px; }
-            .option-icon { font-size: 2.8em; }
-            .option-text { font-size: 1.0em; }
-            .option-desc { font-size: 0.8em; }
-            .results-section { padding: 60px 10px; }
-            .results-section .container { padding: 0 5px; }
-            .products-grid { grid-template-columns: 1fr; gap: 15px; }
-            .product-content { padding: 15px; }
-            .product-name { font-size: 1.1em; margin-bottom: 8px; }
-            .product-reason { font-size: 0.8em; margin-bottom: 8px; }
-            .product-desc { font-size: 0.8em; margin-bottom: 10px; line-height: 1.4;}
-            .product-features { margin-bottom: 10px; gap: 4px;}
-            .feature-tag { font-size: 0.7em; padding: 3px 8px; }
-            .product-footer { padding-top: 10px; }
-            .product-price { font-size: 1.15em; }
-            .product-cta { font-size: 0.85em; padding: 9px 18px;}
-            .results-header h2 { font-size: 1.8em; }
-            .score-number { font-size: 3.5em; }
-            .step-header { gap: 8px; padding: 18px; }
-            .step-icon { width: 55px; height: 55px; font-size: 2.2em; }
-            .step-title { font-size: 1.4em; }
-            .step-subtitle { font-size: 0.95em; }
-            .exit-popup-content { padding: 30px 20px; }
-            .exit-popup h3 { font-size: 1.5em; margin-bottom: 10px;}
-            .exit-popup p { font-size: 0.9em; margin-bottom: 20px;}
-            .exit-popup button { font-size: 1em; padding: 14px 25px;}
-            .exit-popup .exit-popup-close { font-size: 1.5em; top: 8px; right: 8px;}
-            .chart-container { height: 280px; }
-        }
-        @media (max-width: 480px) {
-            .hero { padding: 70px 10px; } 
-            .hero h1 { font-size: 1.9em; } 
-            .hero p { font-size: 0.9em; }
-            .cta-button { font-size: 0.9em; padding: 12px 22px; }
-            .trust-item { font-size: 0.85em; padding: 6px 15px;} 
-            .survey-section { padding: 60px 10px; }
-            .survey-section h2 { font-size: 1.6em; }
-            .survey-section .subtitle { font-size: 0.85em; margin-bottom: 30px;}
-            .question h3 { font-size: 1.3em; margin-bottom: 25px;}
-            .results-section { padding: 50px 5px; }
-            .score-number { font-size: 2.8em; margin: 15px 0; }
-            .score-label { font-size: 0.9em; }
-            .score-badge { font-size: 0.8em; padding: 6px 15px; }
-            .step-title { font-size: 1.1em; }
-            .step-subtitle { font-size: 0.85em; }
-            .product-name { font-size: 0.95em; }
-            .product-reason { font-size: 0.75em; gap: 4px; margin-bottom: 6px;}
-            .product-desc { font-size: 0.75em; line-height: 1.3; margin-bottom: 8px;}
-            .feature-tag { font-size: 0.65em; padding: 2px 6px; }
-            .product-price { font-size: 1.0em; }
-            .product-cta { font-size: 0.75em; padding: 7px 14px;}
-            .radar-chart { padding: 20px; margin-bottom: 30px;}
-            .radar-chart h3 { font-size: 1.2em; margin-bottom: 15px;}
-            .chart-container { height: 210px; }
-            .email-capture { padding: 25px 15px;}
-            .email-capture h3 { font-size: 1.2em; }
-            .email-capture p { font-size: 0.85em; }
-            .email-submit { font-size: 0.85em; padding: 10px 25px; }
+            .hero h1 { font-size: 2em; }
+            .hero p { font-size: 1em; }
+            .region-select { font-size: 1em; padding: 12px 40px 12px 20px; min-width: 180px; }
+            .survey-section h2 { font-size: 1.8em; }
+            .question h3 { font-size: 1.4em; }
+            .options { grid-template-columns: 1fr; }
+            .results-header h2 { font-size: 2em; }
+            .profile-content { flex-direction: column; }
+            .products-grid { grid-template-columns: 1fr; }
+            .trust-indicators { gap: 15px; }
         }
     </style>
 </head>
@@ -300,113 +286,119 @@
         <div class="loading-text">데이터를 불러오는 중...</div>
     </div>
 
-    <!-- Progress Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loader"></div>
-        <div class="loading-text">AI가 당신의 여행 스타일을 분석하고 있습니다...</div>
-    </div>
-
-    <!-- Exit Popup -->
-    <div class="exit-popup" id="exitPopup">
-        <div class="exit-popup-content">
-            <button class="exit-popup-close" onclick="closeExitPopup()">×</button>
-            <h3>잠깐만요! 🎁</h3>
-            <p>지금 1분만 투자하면<br>나에게 딱 맞는 여행을 찾을 수 있어요!</p>
-            <button onclick="closeExitPopup(); scrollToSurvey();">지금 바로 시작하기</button>
-        </div>
-    </div>
-
     <!-- Hero Section -->
-    <section class="hero" id="heroSection">
+    <header class="hero" id="heroSection">
         <div class="hero-content">
-            <div class="container">
-                <h1 id="heroTitle">맞춤 여행 추천</h1>
-                <p id="heroSubtitle">잠시만 기다려주세요...</p>
-                <button class="cta-button" onclick="startSurvey()">
-                    <span id="ctaText">설문 시작하기</span>
-                    <span>→</span>
-                </button>
-                <div class="trust-indicators" id="trustIndicators"></div>
+            <!-- 지역 선택 드롭다운 -->
+            <div class="region-selector-wrapper">
+                <span class="region-selector-label">🌍 여행지 선택:</span>
+                <div class="region-selector-dropdown">
+                    <select id="regionSelect" class="region-select" onchange="changeRegion(this.value)">
+                        <option value="">지역을 불러오는 중...</option>
+                    </select>
+                </div>
+            </div>
+
+            <h1 id="heroTitle">맞춤 여행 상품 추천</h1>
+            <p id="heroSubtitle">1분 설문으로 나에게 딱 맞는 상품 찾기</p>
+            <button class="cta-button" onclick="startSurvey()">
+                <span>✨</span>
+                <span>설문 시작하기</span>
+            </button>
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <span>✓</span>
+                    <span>무료 추천</span>
+                </div>
+                <div class="trust-item">
+                    <span>⚡</span>
+                    <span>1분 소요</span>
+                </div>
+                <div class="trust-item">
+                    <span>🎯</span>
+                    <span>맞춤형 결과</span>
+                </div>
             </div>
         </div>
-    </section>
+    </header>
 
     <!-- Survey Section -->
     <section class="survey-section" id="surveySection">
         <div class="container">
-            <h2 id="surveyTitle">1분이면 충분해요</h2>
-            <p class="subtitle" id="surveySubtitle">나만을 위한 여행 찾기</p>
+            <h2>나에게 맞는 상품 찾기</h2>
+            <p class="subtitle">간단한 질문으로 완벽한 여행 준비하세요</p>
+            
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressBar"></div>
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-text" id="progressText">1 / 4 단계</div>
+                <div class="progress-text" id="progressText">질문 1 / 4</div>
             </div>
+
             <div id="questionsContainer"></div>
         </div>
     </section>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">맞춤 상품을 찾고 있습니다...</div>
+    </div>
 
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="container">
             <div class="results-header">
-                <h2 id="resultTitle">맞춤 여행 추천!</h2>
-                <div class="results-actions">
-                    <button class="btn-reset" onclick="resetSurvey()">
-                        <span>🔄</span>
-                        <span>다시 추천받기</span>
-                    </button>
-                </div>
+                <h2>🎉 여행자님을 위한 맞춤 추천!</h2>
+                <p id="resultsSubtitle"></p>
             </div>
 
-            <div class="matching-score">
-                <div class="score-content">
-                    <h3>내 여행 스타일 매칭 점수</h3>
-                    <div class="score-number" id="scoreNumber">0점</div>
-                    <p class="score-label">스타일 분석 완료! 최적 상품만 모았어요.</p>
-                    <div class="score-badge">✨ 추천 준비 완료</div>
-                </div>
-            </div>
-
-            <div class="radar-chart">
-                <h3>나의 여행 스타일 분석</h3>
-                <div class="chart-container">
-                    <canvas id="radarChart"></canvas>
-                </div>
-                <p class="chart-description" id="chartDescription">여행자님의 성향을 분석하여 최적의 상품을 추천했습니다.</p>
-            </div>
-
-            <div class="timeline-step">
-                <div class="step-header">
-                    <div class="step-icon">✈️</div>
-                    <div class="step-info">
-                        <div class="step-title">STEP 1. 출국 전 준비</div>
-                        <div class="step-subtitle">여행의 시작, 든든하고 편안하게</div>
+            <div class="profile-card">
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <h3>나의 여행 프로필</h3>
+                        <div class="profile-badges" id="profileBadges"></div>
+                    </div>
+                    <div class="radar-chart-container">
+                        <canvas id="radarChart"></canvas>
                     </div>
                 </div>
-                <div class="products-grid" id="step1Products"></div>
+                <div class="chart-description" id="chartDescription"></div>
             </div>
 
-            <div class="timeline-step">
-                <div class="step-header">
-                    <div class="step-icon">🏨</div>
-                    <div class="step-info">
-                        <div class="step-title">STEP 2. 편안한 휴식</div>
-                        <div class="step-subtitle">여행의 질을 높이는 숙소</div>
+            <div class="timeline">
+                <div class="timeline-step">
+                    <div class="step-header">
+                        <div class="step-icon">🛫</div>
+                        <div class="step-info">
+                            <div class="step-title">STEP 1. 출국 전 필수 준비</div>
+                            <div class="step-subtitle">여행 전 꼭 챙겨야 할 것들</div>
+                        </div>
                     </div>
+                    <div class="products-grid" id="step1Products"></div>
                 </div>
-                <div class="products-grid" id="step2Products"></div>
-            </div>
 
-            <div class="timeline-step">
-                <div class="step-header">
-                    <div class="step-icon">🎉</div>
-                    <div class="step-info">
-                        <div class="step-title">STEP 3. 여행 즐기기</div>
-                        <div class="step-subtitle">잊지 못할 특별한 순간 만들기</div>
+                <div class="timeline-step">
+                    <div class="step-header">
+                        <div class="step-icon">🏨</div>
+                        <div class="step-info">
+                            <div class="step-title">STEP 2. 완벽한 숙소</div>
+                            <div class="step-subtitle">편안한 휴식을 위한 추천 숙소</div>
+                        </div>
                     </div>
+                    <div class="products-grid" id="step2Products"></div>
                 </div>
-                <div class="products-grid" id="step3Products"></div>
+
+                <div class="timeline-step">
+                    <div class="step-header">
+                        <div class="step-icon">🎉</div>
+                        <div class="step-info">
+                            <div class="step-title">STEP 3. 여행 즐기기</div>
+                            <div class="step-subtitle">잊지 못할 특별한 순간 만들기</div>
+                        </div>
+                    </div>
+                    <div class="products-grid" id="step3Products"></div>
+                </div>
             </div>
 
             <div class="email-capture">
@@ -421,13 +413,24 @@
         </div>
     </section>
 
+    <!-- Exit Intent Popup -->
+    <div class="exit-popup" id="exitPopup">
+        <div class="exit-popup-content">
+            <h3>🤔 이대로 나가시나요?</h3>
+            <p>1분만 투자하면 완벽한 맞춤 상품을 받아보실 수 있어요!</p>
+            <div class="exit-popup-buttons">
+                <button class="btn-stay" onclick="closeExitPopup()">계속 진행하기</button>
+                <button class="btn-leave" onclick="closeExitPopup()">나가기</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===================================
         // 구글 스프레드시트 설정
         // ===================================
         const GOOGLE_SHEETS_CONFIG = {
             // 여기에 구글 스프레드시트 CSV URL을 입력하세요
-            // 예시: 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Config'
             configUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=0&single=true&output=csv',
             questionsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=2022399600&single=true&output=csv',
             productsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNaDAFtso2Quna8a7lbcnXLZBc3_nUdDqvLIf3CCBKTuaSVWXSKRdfLoSvf_xjPejMwtftiTztLfq/pub?gid=756871285&single=true&output=csv'
@@ -438,11 +441,30 @@
         // ===================================
         let currentRegion = null;
         let configData = null;
+        let allConfigData = []; // 모든 지역 설정
         let questionsData = [];
         let productsData = [];
         let currentQuestion = 1;
         let answers = {};
         let exitIntentShown = false;
+
+        // ===================================
+        // 지역별 아이콘 매핑
+        // ===================================
+        const REGION_ICONS = {
+            'las_vegas': '🎰',
+            'tokyo': '🗼',
+            'paris': '🗼',
+            'london': '🏛️',
+            'jeju': '🏝️',
+            'bangkok': '🏯',
+            'singapore': '🦁',
+            'hongkong': '🏙️',
+            'newyork': '🗽',
+            'rome': '🏛️',
+            'barcelona': '🏰',
+            'sydney': '🌊'
+        };
 
         // ===================================
         // 데이터 로딩 함수
@@ -463,21 +485,63 @@
             });
         }
 
+        // ===================================
+        // 지역 선택 드롭다운 초기화
+        // ===================================
+        async function initializeRegionSelector() {
+            try {
+                // Config 데이터 로드 (모든 지역)
+                allConfigData = await loadCSVData(GOOGLE_SHEETS_CONFIG.configUrl);
+                
+                const selectElement = document.getElementById('regionSelect');
+                
+                // URL 파라미터에서 region 가져오기
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlRegion = urlParams.get('region');
+                
+                // 기본값 설정 (URL 파라미터 > 첫 번째 지역)
+                currentRegion = urlRegion || allConfigData[0]?.region_id || 'las_vegas';
+                
+                // 드롭다운 옵션 생성
+                selectElement.innerHTML = allConfigData.map(region => {
+                    const icon = REGION_ICONS[region.region_id] || '✈️';
+                    const selected = region.region_id === currentRegion ? 'selected' : '';
+                    return `<option value="${region.region_id}" ${selected}>${icon} ${region.region_name_ko}</option>`;
+                }).join('');
+                
+            } catch (error) {
+                console.error('지역 선택 초기화 오류:', error);
+                document.getElementById('regionSelect').innerHTML = '<option value="">오류 발생</option>';
+            }
+        }
+
+        // ===================================
+        // 지역 변경 처리
+        // ===================================
+        function changeRegion(newRegion) {
+            if (newRegion && newRegion !== currentRegion) {
+                // URL 업데이트
+                const newUrl = `${window.location.pathname}?region=${newRegion}`;
+                window.location.href = newUrl;
+            }
+        }
+
+        // ===================================
+        // 앱 초기화
+        // ===================================
         async function initializeApp() {
             try {
-                // URL에서 region 파라미터 가져오기
-                const urlParams = new URLSearchParams(window.location.search);
-                currentRegion = urlParams.get('region') || 'las_vegas'; // 기본값
-
-                // 데이터 로딩
-                const [config, questions, products] = await Promise.all([
-                    loadCSVData(GOOGLE_SHEETS_CONFIG.configUrl),
+                // 지역 선택 드롭다운 초기화
+                await initializeRegionSelector();
+                
+                // Questions와 Products 데이터 로드
+                const [questions, products] = await Promise.all([
                     loadCSVData(GOOGLE_SHEETS_CONFIG.questionsUrl),
                     loadCSVData(GOOGLE_SHEETS_CONFIG.productsUrl)
                 ]);
 
                 // 현재 지역에 맞는 데이터 필터링
-                configData = config.find(row => row.region_id === currentRegion);
+                configData = allConfigData.find(row => row.region_id === currentRegion);
                 questionsData = questions.filter(row => row.region_id === currentRegion);
                 productsData = products.filter(row => row.region_id === currentRegion);
 
@@ -494,6 +558,7 @@
                 document.getElementById('initialLoading').classList.add('hidden');
 
                 // URL 파라미터로 답변이 전달된 경우 결과 표시
+                const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('companion') && urlParams.has('style') && 
                     urlParams.has('priority') && urlParams.has('destination')) {
                     answers = {
@@ -503,15 +568,13 @@
                         destination: urlParams.get('destination')
                     };
                     showResultsDirectly();
-                    history.replaceState(null, '', window.location.pathname + '?region=' + currentRegion);
                 }
             } catch (error) {
                 console.error('데이터 로딩 오류:', error);
                 document.getElementById('initialLoading').innerHTML = `
                     <div style="text-align: center; color: white;">
                         <h2>⚠️ 데이터 로딩 실패</h2>
-                        <p>구글 스프레드시트 연결을 확인해주세요.</p>
-                        <p style="font-size: 0.9em; margin-top: 20px;">${error.message}</p>
+                        <p>${error.message}</p>
                         <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: white; color: #667eea; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">다시 시도</button>
                     </div>
                 `;
@@ -522,48 +585,60 @@
         // Hero 섹션 렌더링
         // ===================================
         function renderHeroSection() {
-            document.getElementById('heroTitle').innerHTML = configData.hero_title || '맞춤 여행 추천';
-            document.getElementById('heroSubtitle').innerHTML = configData.hero_subtitle || '설문을 시작하세요';
-            document.getElementById('ctaText').textContent = configData.cta_text || '설문 시작하기';
-            
-            const trustHtml = [
-                configData.trust_indicator_1,
-                configData.trust_indicator_2,
-                configData.trust_indicator_3
-            ].filter(item => item).map(item => 
-                `<div class="trust-item">✓ ${item}</div>`
-            ).join('');
-            
-            document.getElementById('trustIndicators').innerHTML = trustHtml;
-            document.getElementById('surveyTitle').textContent = configData.survey_title || '설문 시작';
-            document.getElementById('surveySubtitle').textContent = configData.survey_subtitle || '답변해주세요';
-            document.getElementById('resultTitle').innerHTML = configData.result_title || '추천 결과';
+            document.getElementById('heroTitle').textContent = 
+                `${configData.region_name_ko} 맞춤 여행 상품 추천`;
+            document.getElementById('heroSubtitle').textContent = 
+                configData.tagline || '1분 설문으로 나에게 딱 맞는 상품 찾기';
         }
 
         // ===================================
-        // 설문 섹션 렌더링
+        // Survey 섹션 렌더링
         // ===================================
         function renderSurveySection() {
             const container = document.getElementById('questionsContainer');
-            const questions = groupQuestions();
             
-            container.innerHTML = questions.map((q, index) => {
-                const questionNum = index + 1;
-                const backButton = questionNum > 1 ? 
-                    `<div class="question-nav">
-                        <button class="btn-back" onclick="previousQuestion(${questionNum})">← 이전</button>
-                    </div>` : '';
+            // 질문별로 그룹화
+            const questionGroups = {};
+            questionsData.forEach(row => {
+                if (!questionGroups[row.question_id]) {
+                    questionGroups[row.question_id] = {
+                        order: parseInt(row.question_order),
+                        text: row.question_text,
+                        answer_key: row.answer_key,
+                        options: []
+                    };
+                }
+                questionGroups[row.question_id].options.push({
+                    id: row.option_id,
+                    order: parseInt(row.option_order),
+                    icon: row.option_icon,
+                    text: row.option_text,
+                    desc: row.option_desc
+                });
+            });
+
+            // 질문 순서대로 정렬
+            const sortedQuestions = Object.entries(questionGroups)
+                .sort(([, a], [, b]) => a.order - b.order);
+
+            // HTML 생성
+            container.innerHTML = sortedQuestions.map(([qId, qData], idx) => {
+                const isActive = idx === 0 ? 'active' : '';
+                const showBack = idx > 0;
+                
+                // 옵션 정렬
+                const sortedOptions = qData.options.sort((a, b) => a.order - b.order);
                 
                 return `
-                    <div class="question ${questionNum === 1 ? 'active' : ''}" id="q${questionNum}">
-                        ${backButton}
-                        <h3>${q.question_text}</h3>
+                    <div class="question ${isActive}" id="question${idx + 1}" data-answer-key="${qData.answer_key}">
+                        ${showBack ? '<div class="question-nav"><button class="btn-back" onclick="previousQuestion()">← 이전 질문</button></div>' : ''}
+                        <h3>${qData.text}</h3>
                         <div class="options">
-                            ${q.options.map(opt => `
-                                <div class="option" onclick="handleClick(${questionNum}, '${opt.option_id}', '${opt.answer_key}')">
-                                    <div class="option-icon">${opt.option_icon}</div>
-                                    <div class="option-text">${opt.option_text}</div>
-                                    ${opt.option_desc ? `<div class="option-desc">${opt.option_desc}</div>` : ''}
+                            ${sortedOptions.map(opt => `
+                                <div class="option" onclick="selectOption('${qData.answer_key}', '${opt.id}', ${idx + 1})">
+                                    <div class="option-icon">${opt.icon}</div>
+                                    <div class="option-text">${opt.text}</div>
+                                    ${opt.desc ? `<div class="option-desc">${opt.desc}</div>` : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -572,250 +647,172 @@
             }).join('');
         }
 
-        function groupQuestions() {
-            const grouped = [];
-            const questionIds = [...new Set(questionsData.map(q => q.question_id))];
-            
-            questionIds.sort((a, b) => {
-                const orderA = parseInt(questionsData.find(q => q.question_id === a).question_order);
-                const orderB = parseInt(questionsData.find(q => q.question_id === b).question_order);
-                return orderA - orderB;
-            });
-            
-            questionIds.forEach(qId => {
-                const questionRows = questionsData.filter(q => q.question_id === qId);
-                const options = questionRows.map(q => ({
-                    option_id: q.option_id,
-                    option_order: parseInt(q.option_order),
-                    option_icon: q.option_icon,
-                    option_text: q.option_text,
-                    option_desc: q.option_desc,
-                    answer_key: q.answer_key
-                })).sort((a, b) => a.option_order - b.option_order);
-                
-                grouped.push({
-                    question_id: qId,
-                    question_text: questionRows[0].question_text,
-                    options: options
-                });
-            });
-            
-            return grouped;
-        }
-
         // ===================================
-        // 설문 진행 함수
+        // 설문 시작
         // ===================================
-        window.handleClick = function(questionNum, value, answerKey) {
-            answers[answerKey] = value;
-            
-            const options = document.querySelectorAll(`#q${questionNum} .option`);
-            options.forEach(opt => opt.classList.remove('selected'));
-            event.target.closest('.option').classList.add('selected');
-
-            setTimeout(() => {
-                const totalQuestions = groupQuestions().length;
-                if (questionNum < totalQuestions) {
-                    nextQuestion(questionNum);
-                } else {
-                    showResults();
-                }
-            }, 400);
-        }
-
-        function nextQuestion(currentQ) {
-            document.getElementById(`q${currentQ}`).classList.remove('active');
-            document.getElementById(`q${currentQ + 1}`).classList.add('active');
-            currentQuestion = currentQ + 1;
-            updateProgress();
-        }
-
-        function previousQuestion(currentQ) {
-            if (currentQ > 1) {
-                document.getElementById(`q${currentQ}`).classList.remove('active');
-                document.getElementById(`q${currentQ - 1}`).classList.add('active');
-                currentQuestion = currentQ - 1;
-                updateProgress();
-            }
-        }
-
-        function updateProgress() {
-            const totalQuestions = groupQuestions().length;
-            const progress = (currentQuestion / totalQuestions) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `${currentQuestion} / ${totalQuestions} 단계`;
-        }
-
         function startSurvey() {
             document.getElementById('surveySection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function scrollToSurvey() {
-            document.getElementById('surveySection').scrollIntoView({ behavior: 'smooth' });
+        // ===================================
+        // 옵션 선택
+        // ===================================
+        function selectOption(answerKey, optionId, questionNum) {
+            answers[answerKey] = optionId;
+            
+            // 선택된 옵션 시각적 표시
+            const currentQuestion = document.getElementById(`question${questionNum}`);
+            currentQuestion.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // 다음 질문으로
+            setTimeout(() => {
+                if (questionNum < 4) {
+                    nextQuestion();
+                } else {
+                    showResults();
+                }
+            }, 300);
         }
 
         // ===================================
-        // 결과 표시 함수
+        // 다음/이전 질문
+        // ===================================
+        function nextQuestion() {
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            currentQuestion++;
+            document.getElementById(`question${currentQuestion}`).classList.add('active');
+            updateProgress();
+            document.getElementById('surveySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function previousQuestion() {
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            currentQuestion--;
+            document.getElementById(`question${currentQuestion}`).classList.add('active');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / 4) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `질문 ${currentQuestion} / 4`;
+        }
+
+        // ===================================
+        // 결과 표시
         // ===================================
         function showResults() {
             document.getElementById('loadingScreen').classList.add('active');
+            
             setTimeout(() => {
+                calculateAndDisplayResults();
                 document.getElementById('loadingScreen').classList.remove('active');
-                document.querySelector('.hero').style.display = 'none';
                 document.getElementById('surveySection').style.display = 'none';
                 document.getElementById('resultsSection').classList.add('active');
-                renderProducts();
-                animateScore();
-                createRadarChart();
-                setTimeout(() => { window.scrollTo(0, 0); }, 100);
-            }, 1500);
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
         }
 
         function showResultsDirectly() {
-            document.querySelector('.hero').style.display = 'none';
+            calculateAndDisplayResults();
+            document.getElementById('heroSection').style.display = 'none';
             document.getElementById('surveySection').style.display = 'none';
             document.getElementById('resultsSection').classList.add('active');
-            renderProducts();
-            animateScore();
-            createRadarChart();
-            setTimeout(() => { window.scrollTo(0, 0); }, 100);
         }
 
-        function resetSurvey() {
-            answers = {};
-            currentQuestion = 1;
-            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
-            document.getElementById('q1').classList.add('active');
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById('resultsSection').classList.remove('active');
-            document.querySelector('.hero').style.display = 'block';
-            document.getElementById('surveySection').style.display = 'block';
-            updateProgress();
-            setTimeout(() => { window.scrollTo(0, 0); }, 100);
+        function calculateAndDisplayResults() {
+            // 프로필 배지
+            const optionTexts = {};
+            questionsData.forEach(row => {
+                if (answers[row.answer_key] === row.option_id) {
+                    optionTexts[row.answer_key] = row.option_text;
+                }
+            });
+
+            document.getElementById('profileBadges').innerHTML = Object.entries(optionTexts)
+                .map(([key, text]) => `<div class="badge">${text}</div>`)
+                .join('');
+
+            document.getElementById('resultsSubtitle').textContent = 
+                `${configData.region_name_ko} 여행을 위한 맞춤 추천 상품입니다`;
+
+            // 레이더 차트
+            renderRadarChart();
+
+            // 상품 추천
+            renderRecommendedProducts();
         }
 
         // ===================================
         // 상품 추천 로직
         // ===================================
-        function calculateRecommendations() {
-            const scored = productsData.map(product => {
-                let score = 0;
-                
-                // 동행자 매칭
-                const companions = product.target_companion ? product.target_companion.split(',').map(s => s.trim()) : [];
-                if (companions.includes(answers.companion)) {
-                    score += 30;
-                }
-                
-                // 우선순위 매칭
-                const priorities = product.target_priority ? product.target_priority.split(',').map(s => s.trim()) : [];
-                if (priorities.includes(answers.priority)) {
-                    score += 40;
-                }
-                
-                // 스타일 매칭
-                const styles = product.target_style ? product.target_style.split(',').map(s => s.trim()) : [];
-                if (styles.includes(answers.style)) {
-                    score += 20;
-                }
-                
-                // 목적지 매칭
-                const destinations = product.target_destination ? product.target_destination.split(',').map(s => s.trim()) : [];
-                if (destinations.includes(answers.destination)) {
-                    score += 15;
-                } else if (destinations.includes('other')) {
-                    score += 5;
-                }
-                
-                return { ...product, totalScore: score };
-            });
+        function renderRecommendedProducts() {
+            const steps = [1, 2, 3];
             
-            return scored.sort((a, b) => b.totalScore - a.totalScore);
-        }
+            steps.forEach(step => {
+                const stepProducts = productsData.filter(p => parseInt(p.step) === step);
+                const scoredProducts = stepProducts.map(product => ({
+                    ...product,
+                    score: calculateProductScore(product)
+                })).sort((a, b) => b.score - a.score);
 
-        function renderProducts() {
-            const recommendations = calculateRecommendations();
-            
-            // Step 1: 출국 전 준비 (보험, 유심 등)
-            const step1 = recommendations.filter(p => parseInt(p.step) === 1).slice(0, 2);
-            
-            // Step 2: 숙소
-            const step2 = recommendations.filter(p => parseInt(p.step) === 2).slice(0, 2);
-            
-            // Step 3: 여행 상품
-            const step3 = recommendations.filter(p => parseInt(p.step) === 3).slice(0, 6);
-            
-            document.getElementById('step1Products').innerHTML = step1.map(createProductCard).join('');
-            document.getElementById('step2Products').innerHTML = step2.map(createProductCard).join('');
-            document.getElementById('step3Products').innerHTML = step3.map(createProductCard).join('');
-        }
-
-        function createProductCard(product) {
-            const tags = product.tags ? product.tags.split(',').map(t => t.trim()) : [];
-            const imageTag = product.image_url ? 
-                `<img src="${product.image_url}" alt="${product.name}" class="product-image" loading="lazy" onerror="this.style.backgroundColor='#eee'; this.alt='이미지 로딩 실패';">` : 
-                '<div style="width:100%; height:200px; background-color:#eee; display:flex; align-items:center; justify-content:center; color: #ccc;">이미지 없음</div>';
-            
-            return `
-                <div class="product-card" onclick="window.open('${product.product_url}', '_blank')">
-                    ${imageTag}
-                    <div class="product-content">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-reason">✓ ${product.reason}</div>
-                        <div class="product-desc">${product.desc}</div>
-                        <div class="product-features">
-                            ${tags.map(tag => `<span class="feature-tag">${tag}</span>`).join('')}
+                const container = document.getElementById(`step${step}Products`);
+                container.innerHTML = scoredProducts.slice(0, 6).map(product => `
+                    <div class="product-card">
+                        <div class="product-header">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">${product.price}</div>
                         </div>
-                        <div class="product-footer">
-                            <div class="product-price">💰 ${product.price}</div>
-                            <button class="product-cta">자세히 보기 →</button>
+                        <div class="product-reason">${product.reason}</div>
+                        <div class="product-desc">${product.desc}</div>
+                        <div class="product-tags">
+                            ${product.tags.split(',').slice(0, 4).map(tag => 
+                                `<div class="product-tag">${tag.trim()}</div>`
+                            ).join('')}
                         </div>
                     </div>
-                </div>
-            `;
+                `).join('');
+            });
         }
 
-        // ===================================
-        // 점수 애니메이션
-        // ===================================
-        function animateScore() {
-            const finalScore = Math.floor(Math.random() * 5) + 95;
-            let current = 0;
-            const increment = finalScore / 50;
-            const scoreElement = document.getElementById('scoreNumber');
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= finalScore) {
-                    current = finalScore;
-                    clearInterval(timer);
+        function calculateProductScore(product) {
+            let score = 0;
+            
+            const targets = {
+                companion: product.target_companion,
+                priority: product.target_priority,
+                style: product.target_style,
+                destination: product.target_destination
+            };
+
+            Object.entries(answers).forEach(([key, value]) => {
+                if (targets[key] && targets[key].includes(value)) {
+                    score += key === 'priority' ? 40 : 20;
                 }
-                scoreElement.textContent = Math.floor(current) + '점';
-            }, 30);
+            });
+
+            return score;
         }
 
         // ===================================
         // 레이더 차트
         // ===================================
-        function createRadarChart() {
-            let chartStatus = Chart.getChart("radarChart");
-            if (chartStatus != undefined) {
-                chartStatus.destroy();
-            }
+        function renderRadarChart() {
             const ctx = document.getElementById('radarChart').getContext('2d');
             
-            const baseValues = {
-                safety: 75, 
-                communication: 80, 
-                convenience: 70, 
-                value: 75, 
-                experience: 85, 
-                special: 80
+            let baseValues = {
+                safety: 60,
+                communication: 60,
+                convenience: 60,
+                value: 60,
+                experience: 60,
+                special: 60
             };
 
-            // 우선순위에 따른 조정
             if (answers.priority === 'safety') { 
                 baseValues.safety = 95; 
-                baseValues.communication = 90; 
+                baseValues.convenience = 85; 
             } else if (answers.priority === 'communication') { 
                 baseValues.communication = 95; 
                 baseValues.convenience = 90; 
@@ -827,7 +824,6 @@
                 baseValues.special = 90; 
             }
 
-            // 스타일에 따른 조정
             if (answers.style === 'photo') { 
                 baseValues.special = Math.min(100, baseValues.special + 10); 
             } else if (answers.style === 'food') { 
@@ -838,7 +834,6 @@
                 baseValues.experience = Math.min(100, baseValues.experience + 5); 
             }
 
-            // 동행자에 따른 조정
             if (answers.companion === 'family') { 
                 baseValues.safety = Math.min(100, baseValues.safety + 10); 
             } else if (answers.companion === 'couple') { 
@@ -872,16 +867,9 @@
                         r: {
                             beginAtZero: true, 
                             max: 100, 
-                            ticks: { 
-                                stepSize: 20, 
-                                display: false 
-                            },
+                            ticks: { stepSize: 20, display: false },
                             pointLabels: { 
-                                font: { 
-                                    size: 14, 
-                                    family: 'Noto Sans KR', 
-                                    weight: '600' 
-                                }, 
+                                font: { size: 14, family: 'Noto Sans KR', weight: '600' }, 
                                 color: '#333' 
                             },
                             grid: { color: 'rgba(0, 0, 0, 0.05)' },
